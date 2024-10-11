@@ -186,6 +186,8 @@ fn find_nearest_takoyaki_index_from_root(game_state: &GameState) -> usize {
     }
 
     assert!(idx_nearest_takoyaki.is_some());
+    eprintln!("idx_nearest_takoyaki: {}", idx_nearest_takoyaki.unwrap());
+    eprintln!("min_dist: {}", min_dist);
     idx_nearest_takoyaki.unwrap()
 }
 
@@ -215,10 +217,17 @@ fn create_operations_p_to_q(game_state: &mut GameState, q: Point) -> Vec<Operati
         })
     }
 
-    let idx_last = operations.len();
-    if idx_last > 0 {
-        operations[idx_last - 1].node_interact[0] = 'P';
+    // rootのいる位置にたこ焼きがあった場合、動かずとも取らなければいけない
+    if operations.is_empty() {
+        operations.push(Operation {
+            arm_move: '.',
+            node_rotate: vec!['.'],
+            node_interact: vec!['.'],
+        });
     }
+
+    let idx_last = operations.len();
+    operations[idx_last - 1].node_interact[0] = 'P';
 
     operations
 }
@@ -369,5 +378,9 @@ mod tests {
         let q = Point { x: 0, y: 5 };
 
         assert_eq!(calc_dist(&p, &q), 6);
+
+        let p = Point { x: 0, y: 0 };
+        let q = Point { x: 0, y: 0 };
+        assert_eq!(calc_dist(&p, &q), 0);
     }
 }
